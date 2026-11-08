@@ -1,13 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Spendly</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
 </head>
 <body>
-    <h1>Spendly</h1>
-    <p>Управляй своими подписками в одном месте.</p>
-    <p>Сервер успешно запущен.</p>
+    <main>
+        <h1>Spendly</h1>
+        <p>Управляй своими подписками в одном месте.</p>
+
+        <section id="auth-status">
+            <p>Проверяем авторизацию...</p>
+        </section>
+
+        <section id="user-profile" hidden>
+            <h2>Добро пожаловать!</h2>
+            <p id="user-name"></p>
+            <p id="user-username"></p>
+            <p id="user-currency"></p>
+        </section>
+    </main>
 </body>
 </html>

@@ -1,57 +1,58 @@
 
-import asyncio
-import logging
+from pathlib import Path
 
-from aiogram import Bot, Dispatcher
-from aiogram.filters import CommandStart
-from aiogram.types import (
-    Message,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    WebAppInfo
-)
+from flask import Flask, jsonify, render_template
 
 from config import Config
+from extensions import db
+
+from models import User, Subscription, Category, Payment
+from routes.auth import auth_bp
 
 
-logging.basicConfig(level=logging.INFO)
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-bot = Bot(token=Config.BOT_TOKEN)
-dp = Dispatcher()
-
-
-@dp.message(CommandStart())
-async def start_handler(message: Message):
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="Открыть Spendly",
-                    web_app=WebAppInfo(
-                        url=Config.WEBAPP_URL
-                    )
-                )
-            ]
-        ]
+    # Создаём папку instance, если её ещё нет
+    Path(app.instance_path).mkdir(
+        parents=True,
+        exist_ok=True
     )
 
-    await message.answer(
-        "Привет! 👋\n\n"
-        "Добро пожаловать в Spendly — "
-        "сервис управления подписками и регулярными платежами.\n\n"
-        "Нажми кнопку ниже, чтобы начать.",
-        reply_markup=keyboard
-    )
+    # Инициализация базы данных
+    db.init_app(app)
+
+    # Подключение маршрутов авторизации
+    app.register_blueprint(auth_bp)
+
+    # Главная страница
+    @app.route("/")
+    def index():
+        return render_template("index.html")
+
+    # Проверка состояния сервера
+    @app.route("/api/health")
+    def health():
+        return jsonify({
+            "status": "ok",
+            "application": "Spendly",
+            "database": "connected"
+        })
+
+    # Создание таблиц базы данных
+    with app.app_context():
+        db.create_all()
+
+    return app
 
 
-async def main():
-    if not Config.BOT_TOKEN:
-        raise ValueError("BOT_TOKEN не указан в .env")
-
-    logging.info("Spendly Bot запущен")
-
-    await dp.start_polling(bot)
+app = create_app()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    app.run(
+        host="127.0.0.1",
+        port=5001,
+        debug=app.config["DEBUG"]
+    )

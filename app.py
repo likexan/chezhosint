@@ -5,6 +5,8 @@ from flask import Flask, jsonify, render_template
 from config import Config
 from extensions import db
 
+from routes.auth import auth_bp
+
 # Импортируем модели, чтобы SQLAlchemy зарегистрировал их
 from models import User, Subscription, Category, Payment
 
@@ -23,6 +25,8 @@ def create_app():
 
     # Подключаем базу данных
     db.init_app(app)
+
+    app.register_blueprint(auth_bp)
 
     # Главная страница
     @app.route("/")
