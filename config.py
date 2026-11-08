@@ -26,3 +26,5 @@ class Config:
 
     # Настройки приложения
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
+    WEBAPP_URL = os.getenv("WEBAPP_URL")
