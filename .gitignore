@@ -1,0 +1,18 @@
+# Переменные окружения
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# База данных
+instance/*.db
+
+# IDE
+.idea/
+.vscode/
+
+# Логи
+*.log
